@@ -24,7 +24,7 @@ void CloseHandleArr(HANDLE* arr, int size)
 	}
 }
 
-DWORD WINAPI writeToFile(void* ptrID)
+DWORD WINAPI writer(void* ptrID)
 {
 	int id = (int)ptrID;
 	WaitForSingleObject(hSignalEvent, INFINITE);
@@ -35,7 +35,7 @@ DWORD WINAPI writeToFile(void* ptrID)
 	SetEvent(hSignalEvent);
 	return 0;
 }
-DWORD WINAPI readFromFile(void* ptrID)
+DWORD WINAPI reader(void* ptrID)
 {
 	int id = (int)ptrID;
 	static int readers = 0;
@@ -64,7 +64,7 @@ DWORD WINAPI runWriters(void *)
 	{
 		Sleep(TIMEDELAY);
 
-		writers[i] = CreateThread(NULL, 0, writeToFile, (void*)i, NULL, 0);;
+		writers[i] = CreateThread(NULL, 0, writer, (void*)i, NULL, 0);;
 	}
 	WaitForMultipleObjects(NUMWRITERS, writers, true, INFINITE);
 	CloseHandleArr(writers, NUMWRITERS);
@@ -78,7 +78,7 @@ DWORD WINAPI runReaders(void*)
 	for (int i = 0; i < NUMREADERS; i++)
 	{
 		Sleep(TIMEDELAY);
-		readers[i] = CreateThread(NULL, 0, readFromFile, (void*)i, NULL, 0);
+		readers[i] = CreateThread(NULL, 0, reader, (void*)i, NULL, 0);
 	}
 	WaitForMultipleObjects(NUMREADERS, readers, true, INFINITE);
 	CloseHandleArr(readers, NUMREADERS);
